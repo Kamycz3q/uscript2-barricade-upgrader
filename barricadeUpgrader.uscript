@@ -16,14 +16,7 @@ config = {
             upgradeFrom: [366,367, 368],
             upgradeTo: 328
         },
-        {
-            //upgrade crates to locker
-            isStorage: false,
-            upgradeFrom: [281 ,282, 283],
-            upgradeTo: 286    
-        }
     ]
-    
 };
 
 command bupgrade() {
