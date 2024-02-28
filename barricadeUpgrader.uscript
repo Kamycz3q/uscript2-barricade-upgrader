@@ -1,0 +1,86 @@
+
+//created by kamycz3q#4601
+//if there is problem write to me on dm
+
+config = {
+    upgradesData: [
+        {
+            //upgrade wardrobes to metal wardrobe
+            isStorage: true,
+            upgradeFrom: [1278,1279, 1280],
+            upgradeTo: 1281 
+        },
+        {
+            //upgrade crates to locker
+            isStorage: true,
+            upgradeFrom: [366,367, 368],
+            upgradeTo: 328
+        },
+        {
+            //upgrade crates to locker
+            isStorage: false,
+            upgradeFrom: [281 ,282, 283],
+            upgradeTo: 286    
+        }
+    ]
+    
+};
+
+command bupgrade() {
+    permission = "storage_upgrader.upgrade";
+    allowedCaller = "player";
+    execute() {
+        barricade = player.look.getBarricade();
+        if (barricade == null) {
+            player.message("No barricade found!", "red");
+            return;
+        }
+        
+        isFoundInConfig = false;
+        upgradeTo = null;
+        isStorage = false;
+        foreach(data in config["upgradesData"]) {
+            if (data["upgradeFrom"].contains(barricade.id)) {
+                isFoundInConfig = true;
+                upgradeTo = data["upgradeTo"];
+                isStorage = true;
+                break;
+            }
+        }
+        //check does have item
+        if (!player.inventory.hasItem(upgradeTo)) {
+            player.message("You don't have upgraded version of this barricade in your inventory", "red");
+            return;
+        }
+        if (!isFoundInConfig) {
+            player.message("Barricade not found in config", "red");
+            return;
+        }
+        inv = null;
+        if (isSet(barricade.storage.inventory)) {
+            inv = barricade.storage.inventory.items;
+            foreach(item in inv) {
+                barricade.storage.inventory.removeItem(item.id);
+            }
+        }
+        
+        owner = barricade.owner;
+        group  = barricade.group;
+
+        angles = [barricade.anglex, barricade.angley, barricade.anglez];
+        pos = barricade.position;
+        player.inventory.removeItem(upgradeTo, 1);
+        player.inventory.addItem(barricade.id, 1);
+        barricade.destroy();
+
+        newBarricade = spawner.spawnBarricade(upgradeTo, pos, angles[0], angles[1],angles[2],owner, group);
+        if (inv != null) {
+            foreach(item in inv) {
+                newBarricade.storage.inventory.addItem(item.id);
+            }
+        }
+        
+
+    }
+    
+}
